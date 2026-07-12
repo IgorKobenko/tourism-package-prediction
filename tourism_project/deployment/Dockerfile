@@ -22,3 +22,5 @@ COPY --chown=user . $HOME/app
 
 # Run the Streamlit app on port 8501, accessible externally
 CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.enableXsrfProtection=false"]
+
+

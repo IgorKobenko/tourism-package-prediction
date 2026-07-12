@@ -15,6 +15,7 @@ repo_type = "dataset"
 api = HfApi(token=os.getenv("HF_TOKEN"))
 
 # Step 1: Check if the dataset repository already exists on the Hub
+# First run creates the repo; every later run just reuses it.
 try:
     api.repo_info(repo_id=repo_id, repo_type=repo_type)
     print(f"Dataset repo '{repo_id}' already exists. Using it.")

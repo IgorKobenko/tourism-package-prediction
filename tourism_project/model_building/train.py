@@ -4,23 +4,30 @@
 # pipeline with GridSearchCV, logs every experiment to MLflow, and
 # registers the best model on the Hugging Face model hub.
 # ---------------------------------------------------------------
+
 # for data manipulation
 import pandas as pd
+
 # for preprocessing and pipeline creation
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import make_column_transformer
 from sklearn.pipeline import make_pipeline
+
 # for model training, tuning and evaluation
 import xgboost as xgb
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import classification_report
+
 # for model serialization
 import joblib
+
 # for folders / env variables
 import os
+
 # for Hugging Face authentication and upload
 from huggingface_hub import login, HfApi, create_repo
 from huggingface_hub.utils import RepositoryNotFoundError, HfHubHTTPError
+
 # for experiment tracking
 import mlflow
 
@@ -110,13 +117,16 @@ with mlflow.start_run():
         "test_f1-score":   test_report["1"]["f1-score"],
     })
 
-    # ------------------ 8. SAVE + REGISTER THE BEST MODEL ------------------
+    # ----------- 8. SAVE + REGISTER THE BEST MODEL ------------------
     model_path = "best_tourism_package_model_v1.joblib"
-    joblib.dump(best_model, model_path)
+    joblib.dump(best_model, model_path) 
+    # joblib.dump serializes the entire fitted pipeline
 
     # Log the model file as an MLflow artifact
     mlflow.log_artifact(model_path, artifact_path="model")
     print(f"Model saved as artifact at: {model_path}")
+    #Attaches the file to the MLflow run 
+
 
     # Register (upload) the model on the Hugging Face model hub
     repo_id = "ivkobenko/tourism-package-model"
@@ -135,4 +145,7 @@ with mlflow.start_run():
         repo_id=repo_id,
         repo_type=repo_type,
     )
+    # Uploads the joblib file. As the filename stays the same, each pipeline run overwrites the previous model — 
+    # - the hub always holds the latest trained version, and the Streamlit app (hf_hub_download in app.py) always fetches whatever is current
+    
     print("Best model registered on the Hugging Face model hub.")
